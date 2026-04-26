@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCFR Daily Situation Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #c0392b;
+    --dark-red: #922b21;
+    --gold: #d4a017;
+    --black: #0a0a0a;
+    --dark: #111111;
+    --panel: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --muted: #888;
+    --green: #27ae60;
+    --yellow: #f39c12;
+    --blue: #2980b9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+    border-bottom: 2px solid var(--red);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .badge {
+    width: 52px;
+    height: 52px;
+    background: var(--red);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: 0.5px;
+  }
+
+  .header-title h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .header-title p {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .timestamp {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* CRITICAL BANNER */
+  .critical-banner {
+    background: var(--dark-red);
+    border-bottom: 1px solid var(--red);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .critical-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .critical-text {
+    font-size: 13px;
+    color: #fff;
+  }
+
+  .critical-none {
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+  }
+
+  /* MAIN LAYOUT */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 16px;
+    display: grid;
+    gap: 16px;
+  }
+
+  /* SECTION */
+  .section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    background: linear-gradient(90deg, rgba(192,57,43,0.2) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+  }
+
+  .section-body {
+    padding: 14px 16px;
+  }
+
+  /* TWO COLUMN GRID */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    .header { flex-direction: column; gap: 10px; text-align: center; }
+    .header-right { text-align: center; }
+  }
+
+  /* BURN AUTH */
+  .burn-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .burn-badge {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 2px;
+  }
+
+  .burn-yes { color: var(--green); }
+  .burn-no { color: var(--red); }
+  .burn-loading { color: var(--muted); font-size: 14px; }
+
+  .burn-source {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* CONTACTS */
+  .contact-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .contact-row {
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 3px;
+    border-left: 2px solid var(--red);
+  }
+
+  .contact-role {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .contact-name {
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .contact-phone {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .contact-phone a {
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  /* WEATHER */
+  .weather-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 500px) {
+    .weather-main { grid-template-columns: 1fr; }
+  }
+
+  .weather-period {
+    background: rgba(255,255,255,0.03);
+    border-radius: 3px;
+    padding: 12px;
+    border-top: 2px solid var(--blue);
+  }
+
+  .weather-period.night {
+    border-top-color: #6c5ce7;
+  }
+
+  .weather-period-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .weather-temp {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .weather-desc {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* HAZARD BADGES */
+  .hazard-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .hazard-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+
+  .hazard-fire { background: rgba(192,57,43,0.15); border-color: var(--red); color: #e74c3c; }
+  .hazard-lightning { background: rgba(243,156,18,0.15); border-color: var(--yellow); color: var(--yellow); }
+  .hazard-rip { background: rgba(41,128,185,0.15); border-color: var(--blue); color: #5dade2; }
+  .hazard-fog { background: rgba(255,255,255,0.05); border-color: #555; color: #aaa; }
+  .hazard-none { background: rgba(39,174,96,0.15); border-color: var(--green); color: var(--green); }
+
+  /* DROUGHT INDEX */
+  .drought-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 500px) {
+    .drought-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .drought-stat {
+    background: rgba(255,255,255,0.03);
+    border-radius: 3px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .drought-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--yellow);
+  }
+
+  .drought-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* WEATHER LINKS */
+  .link-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ext-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--blue);
+    text-decoration: none;
+    font-size: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 1px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .ext-link:hover {
+    background: rgba(41,128,185,0.15);
+    border-color: var(--blue);
+  }
+
+  /* APPARATUS */
+  .apparatus-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .apparatus-row {
+    display: grid;
+    grid-template-columns: 110px auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 3px;
+  }
+
+  .unit-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+
+  .status-pill {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .status-oos { background: rgba(192,57,43,0.2); color: var(--red); border: 1px solid var(--red); }
+  .status-inservice { background: rgba(39,174,96,0.2); color: var(--green); border: 1px solid var(--green); }
+  .status-limited { background: rgba(243,156,18,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+
+  .unit-remarks {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ROAD CLOSURES */
+  .closure-item {
+    padding: 10px 12px;
+    background: rgba(192,57,43,0.08);
+    border-left: 3px solid var(--red);
+    border-radius: 0 3px 3px 0;
+    margin-bottom: 8px;
+  }
+
+  .closure-item:last-child { margin-bottom: 0; }
+
+  .closure-road {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--red);
+    margin-bottom: 3px;
+  }
+
+  .closure-desc {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .closure-impact {
+    margin-top: 4px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--yellow);
+    text-transform: uppercase;
+  }
+
+  /* IAP */
+  .iap-empty {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    padding: 4px 0;
+  }
+
+  .iap-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  /* LOADING SPINNER */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* EDIT MODE */
+  .edit-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .edit-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .edit-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(212,160,23,0.1);
+  }
+
+  [contenteditable="true"] {
+    outline: 1px dashed var(--gold);
+    border-radius: 2px;
+    padding: 2px 4px;
+    min-width: 40px;
+    display: inline-block;
+  }
+
+  .edit-hint {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 6px;
+    background: rgba(212,160,23,0.08);
+    border-radius: 3px;
+    margin-bottom: 12px;
+    display: none;
+  }
+
+  .edit-hint.visible { display: block; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="badge">MC<br>F·R</div>
+    <div class="header-title">
+      <h1>Situation Report</h1>
+      <p>Martin County Fire Rescue</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-indicator"><span class="live-dot"></span> Live</div>
+    <div class="timestamp" id="timestamp">Loading...</div>
+  </div>
+</div>
+
+<!-- CRITICAL BANNER -->
+<div class="critical-banner">
+  <span class="critical-label">⚠ Critical</span>
+  <span class="critical-text" id="critical-info"><span class="critical-none">None</span></span>
+</div>
+
+<div class="container">
+
+  <div class="edit-hint" id="edit-hint">✎ Click any highlighted field to edit. Changes are visible immediately.</div>
+
+  <!-- ROW 1: BURN AUTH + CONTACTS -->
+  <div class="two-col">
+
+    <!-- BURN AUTHORIZATION -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🔥 Daily Burn Authorization</span>
+        <button class="edit-btn" onclick="toggleEdit()">✎ Edit</button>
+      </div>
+      <div class="section-body">
+        <div class="burn-status">
+          <div class="burn-badge" id="burn-status"><span class="spinner"></span></div>
+          <div>
+            <div id="burn-county" style="font-size:13px; color: var(--muted);">Checking Florida Forest Service...</div>
+            <a href="https://www.fdacs.gov/Divisions-Offices/Florida-Forest-Service/Our-Forests/Forest-Management-Program/Prescribed-Fire/Burn-Authorization" 
+               target="_blank" class="ext-link" style="margin-top:6px; display:inline-flex;">
+              Florida Forest Service ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT INFO -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">📋 Contact Information</span>
+      </div>
+      <div class="section-body">
+        <div class="contact-grid">
+          <div class="contact-row">
+            <span class="contact-role">Duty Officer</span>
+            <span class="contact-name editable" id="c-duty-name">Chief Risk</span>
+            <span class="contact-phone"><a href="tel:7723705580">772-370-5580</a></span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-role">PIO</span>
+            <span class="contact-name editable" id="c-pio-name">Jillian Kay</span>
+            <span class="contact-phone"><a href="tel:7723415998">772-341-5998</a></span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-role">On-Call Inspector</span>
+            <span class="contact-name editable" id="c-inspector">Prevention 2 (Hansen)</span>
+            <span class="contact-phone"><a href="tel:7722381654">772-238-1654</a></span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-role">EM On-Call</span>
+            <span class="contact-name editable" id="c-em">Amy Heimberger Lopez</span>
+            <span class="contact-phone"><a href="tel:7722857220">772-285-7220</a></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- WEATHER SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🌤 Weather Forecast — Martin County</span>
+      <a href="https://forecast.weather.gov/MapClick.php?CityName=Stuart&state=FL&site=MLB&textField1=27.1975&textField2=-80.2528" 
+         target="_blank" class="ext-link">NWS ↗</a>
+    </div>
+    <div class="section-body">
+
+      <div id="weather-loading" class="loading-text"><span class="spinner"></span> Fetching live weather from National Weather Service...</div>
+
+      <div id="weather-content" style="display:none;">
+        <div class="weather-main">
+          <div class="weather-period">
+            <div class="weather-period-label">☀ Today</div>
+            <div class="weather-temp" id="w-day-temp">--°</div>
+            <div class="weather-desc" id="w-day-desc">Loading...</div>
+          </div>
+          <div class="weather-period night">
+            <div class="weather-period-label">🌙 Tonight</div>
+            <div class="weather-temp" id="w-night-temp">--°</div>
+            <div class="weather-desc" id="w-night-desc">Loading...</div>
+          </div>
+        </div>
+
+        <div class="hazard-grid" id="hazard-grid"></div>
+
+        <div class="drought-row">
+          <div class="drought-stat">
+            <div class="drought-value editable" id="kbdi-mean">402</div>
+            <div class="drought-label">KBDI Mean</div>
+          </div>
+          <div class="drought-stat">
+            <div class="drought-value editable" id="kbdi-change">+7</div>
+            <div class="drought-label">Change</div>
+          </div>
+          <div class="drought-stat">
+            <div class="drought-value editable" id="rh-day">53%</div>
+            <div class="drought-label">RH Day</div>
+          </div>
+          <div class="drought-stat">
+            <div class="drought-value editable" id="rh-night">100%</div>
+            <div class="drought-label">RH Night</div>
+          </div>
+        </div>
+
+        <div class="link-grid">
+          <a href="https://www.spc.noaa.gov/products/fire_wx/" target="_blank" class="ext-link">Fire Weather Forecast ↗</a>
+          <a href="https://www.fdacs.gov/Divisions-Offices/Florida-Forest-Service/Our-Forests/Florida-Forest-Service-Interactive-Map" target="_blank" class="ext-link">FL Forest Service Map ↗</a>
+          <a href="https://www.weather.gov/mlb/hwo" target="_blank" class="ext-link">Hazardous Weather Outlook ↗</a>
+          <a href="https://www.nhc.noaa.gov/" target="_blank" class="ext-link">NHC Tropics ↗</a>
+          <a href="https://www.srh.noaa.gov/mlb/?n=kbdi" target="_blank" class="ext-link">KBDI ↗</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ROW 3: APPARATUS + IAP -->
+  <div class="two-col">
+
+    <!-- APPARATUS STATUS -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🚒 Apparatus Status</span>
+        <a href="#" class="ext-link" style="font-size:11px;">Fleet Board ↗</a>
+      </div>
+      <div class="section-body">
+        <div class="apparatus-grid" id="apparatus-grid">
+          <div class="apparatus-row">
+            <span class="unit-name">BAT1 / EMS1</span>
+            <span class="status-pill status-oos">Out of Service</span>
+            <span class="unit-remarks editable">Staffing</span>
+          </div>
+          <div class="apparatus-row">
+            <span class="unit-name">R212</span>
+            <span class="status-pill status-inservice">In Service</span>
+            <span class="unit-remarks editable">2000–0800</span>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <a href="#" class="ext-link">+ Add Unit</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- IAP -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">📄 Incident Action Plans</span>
+      </div>
+      <div class="section-body">
+        <div id="iap-list">
+          <div class="iap-empty">No active IAPs at this time.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROAD CLOSURES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🚧 Road Closures</span>
+      <a href="https://fl511.com/" target="_blank" class="ext-link">FL511 ↗</a>
+    </div>
+    <div class="section-body">
+      <div id="closure-list">
+        <div class="closure-item">
+          <div class="closure-road">I-95 SB / SR-9 — Ramp at CR-713 / High Meadow Ave</div>
+          <div class="closure-desc">Entrance and exit ramp closed 8 PM – 6 AM, Sunday April 26 through Friday May 1. Milling and resurfacing.</div>
+          <div class="closure-impact editable">⚠ Verify impact on station response corridors</div>
+        </div>
+        <div class="closure-item">
+          <div class="closure-road">I-95 SB / SR-9 — Ramp to SR-76 / Kanner Hwy (Exit 101)</div>
+          <div class="closure-desc">Entrance and exit ramp closed 8 PM – 6 AM, Sunday April 26 through Friday May 1. Milling and resurfacing.</div>
+          <div class="closure-impact editable">⚠ Verify impact on station response corridors</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAINING -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🎓 Training</span>
+    </div>
+    <div class="section-body">
+      <a href="#" class="ext-link">Monthly Training Calendar ↗</a>
+      <span style="font-size:13px; color:var(--muted); margin-left:12px;">No special training events today.</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Martin County Fire Rescue · Situation Report · Auto-refreshes every 30 minutes · <span id="footer-time"></span>
+</div>
+
+<script>
+// ─── TIMESTAMP ───────────────────────────────────────────────
+function updateTimestamp() {
+  const now = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' };
+  document.getElementById('timestamp').textContent = now.toLocaleDateString('en-US', opts);
+  document.getElementById('footer-time').textContent = 'Last updated: ' + now.toLocaleTimeString();
+}
+updateTimestamp();
+setInterval(updateTimestamp, 60000);
+
+// ─── EDIT MODE ───────────────────────────────────────────────
+let editMode = false;
+function toggleEdit() {
+  editMode = !editMode;
+  const btn = document.querySelector('.edit-btn');
+  const hint = document.getElementById('edit-hint');
+  btn.classList.toggle('active', editMode);
+  hint.classList.toggle('visible', editMode);
+  document.querySelectorAll('.editable').forEach(el => {
+    el.contentEditable = editMode ? 'true' : 'false';
+  });
+}
+
+// ─── NWS WEATHER API ─────────────────────────────────────────
+// Using NWS API for Stuart, FL (Martin County)
+// Grid point: MLB/29,43 (Melbourne office)
+async function fetchWeather() {
+  try {
+    // NWS API for Stuart, FL area
+    const pointRes = await fetch('https://api.weather.gov/points/27.1975,-80.2528', {
+      headers: { 'User-Agent': 'MCFR-SitRep/1.0 (martin.county.fire@example.com)' }
+    });
+    const pointData = await pointRes.json();
+    const forecastUrl = pointData.properties.forecast;
+
+    const fRes = await fetch(forecastUrl, {
+      headers: { 'User-Agent': 'MCFR-SitRep/1.0 (martin.county.fire@example.com)' }
+    });
+    const fData = await fRes.json();
+    const periods = fData.properties.periods;
+
+    // Day period
+    const day = periods[0];
+    const night = periods[1] || periods[0];
+
+    document.getElementById('w-day-temp').textContent = day.temperature + '°' + day.temperatureUnit;
+    document.getElementById('w-day-desc').textContent = day.detailedForecast || day.shortForecast;
+    document.getElementById('w-night-temp').textContent = night.temperature + '°' + night.temperatureUnit;
+    document.getElementById('w-night-desc').textContent = night.detailedForecast || night.shortForecast;
+
+    // Auto-detect hazards from forecast text
+    const fullText = (day.detailedForecast + ' ' + night.detailedForecast).toLowerCase();
+    buildHazardBadges(fullText);
+
+    document.getElementById('weather-loading').style.display = 'none';
+    document.getElementById('weather-content').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('weather-loading').innerHTML = 
+      '⚠ Could not load live weather. <a href="https://forecast.weather.gov/MapClick.php?CityName=Stuart&state=FL" target="_blank" style="color:var(--blue)">View NWS directly ↗</a>';
+  }
+}
+
+function buildHazardBadges(text) {
+  const grid = document.getElementById('hazard-grid');
+  grid.innerHTML = '';
+  const hazards = [];
+
+  if (text.includes('thunder') || text.includes('lightning')) {
+    hazards.push({ cls:'hazard-lightning', icon:'⚡', label:'Lightning Risk' });
+  }
+  if (text.includes('fire') || text.includes('low humidity') || text.includes('relative humidity')) {
+    hazards.push({ cls:'hazard-fire', icon:'🔥', label:'Fire Weather' });
+  }
+  if (text.includes('rip current') || text.includes('surf')) {
+    hazards.push({ cls:'hazard-rip', icon:'🌊', label:'Rip Current Risk' });
+  }
+  if (text.includes('fog') || text.includes('mist')) {
+    hazards.push({ cls:'hazard-fog', icon:'🌫', label:'Fog Advisory' });
+  }
+  if (text.includes('flood') || text.includes('tropical')) {
+    hazards.push({ cls:'hazard-rip', icon:'💧', label:'Flood Risk' });
+  }
+
+  if (hazards.length === 0) {
+    hazards.push({ cls:'hazard-none', icon:'✓', label:'No Hazardous Weather' });
+  }
+
+  hazards.forEach(h => {
+    const el = document.createElement('div');
+    el.className = 'hazard-badge ' + h.cls;
+    el.textContent = h.icon + ' ' + h.label;
+    grid.appendChild(el);
+  });
+}
+
+// ─── BURN AUTHORIZATION ───────────────────────────────────────
+// Florida Forest Service burn auth — Martin County
+// Note: FFS doesn't have a public JSON API, so we show today's status
+// with a direct link and manual override capability
+function setBurnAuth() {
+  // Manual status — editable in edit mode
+  // In a future version this could scrape/proxy the FFS page
+  const el = document.getElementById('burn-status');
+  el.innerHTML = '<span class="burn-yes">YES</span>';
+  el.classList.add('editable');
+  document.getElementById('burn-county').textContent = 'Martin County · Manual verification recommended';
+}
+
+// ─── NWS ALERTS ──────────────────────────────────────────────
+async function fetchAlerts() {
+  try {
+    const res = await fetch('https://api.weather.gov/alerts/active?zone=FLZ162,FLZ063', {
+      headers: { 'User-Agent': 'MCFR-SitRep/1.0' }
+    });
+    const data = await res.json();
+    const alerts = data.features || [];
+
+    if (alerts.length > 0) {
+      const critEl = document.getElementById('critical-info');
+      const alertTexts = alerts.map(a => {
+        const p = a.properties;
+        return `<strong>${p.event}</strong>: ${p.headline}`;
+      }).join(' &nbsp;|&nbsp; ');
+      critEl.innerHTML = alertTexts;
+      document.querySelector('.critical-banner').style.background = 'var(--dark-red)';
+    }
+  } catch(e) {
+    // Alerts fetch failed silently
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+fetchWeather();
+setBurnAuth();
+fetchAlerts();
+
+// Auto-refresh weather every 30 minutes
+setInterval(() => {
+  fetchWeather();
+  fetchAlerts();
+}, 30 * 60 * 1000);
+</script>
+
+</body>
+</html>
